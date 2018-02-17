@@ -5,37 +5,37 @@ package io.github.yahia_hassan.popularmovies;
  */
 
 public class Movie {
-//    private String mMovieTitle;
+    private String mMovieTitle;
     private String mMoviePoster;
-//    private String mPlotSynopsis;
-//    private String mUserRating;
-//    private String mReleaseDate;
+    private String mPlotSynopsis;
+    private String mUserRating;
+    private String mReleaseDate;
 
-    public Movie(String moviePoster) {
-//        mMovieTitle = movieTitle;
+    public Movie(String movieTitle, String moviePoster, String plotSynopsis, String userRating, String releaseDate) {
+        mMovieTitle = movieTitle;
         mMoviePoster = moviePoster;
-//        mPlotSynopsis = plotSynopsis;
-//        mUserRating = userRating;
-//        mReleaseDate = releaseDate;
+        mPlotSynopsis = plotSynopsis;
+        mUserRating = userRating;
+        mReleaseDate = releaseDate;
     }
 
-//    public String getMovieTitle() {
-//        return mMovieTitle;
-//    }
+    public String getMovieTitle() {
+        return mMovieTitle;
+    }
 
     public String getMoviePoster() {
         return mMoviePoster;
     }
 
-//    public String getPlotSynopsis() {
-//        return mPlotSynopsis;
-//    }
-//
-//    public String getUserRating() {
-//        return mUserRating;
-//    }
-//
-//    public String getReleaseDate() {
-//        return mReleaseDate;
-//    }
+    public String getPlotSynopsis() {
+        return mPlotSynopsis;
+    }
+
+    public String getUserRating() {
+        return mUserRating;
+    }
+
+    public String getReleaseDate() {
+        return mReleaseDate;
+    }
 }

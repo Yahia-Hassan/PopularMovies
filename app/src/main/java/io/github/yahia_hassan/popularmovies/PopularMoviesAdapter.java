@@ -35,7 +35,7 @@ public class PopularMoviesAdapter extends RecyclerView.Adapter<PopularMoviesAdap
     @Override
     public void onBindViewHolder(PopularMoviesViewHolder holder, int position) {
         Movie movie = mMovieArrayList.get(position);
-        String UrlFirstPart = "https://image.tmdb.org/t/p/w342/";
+        String UrlFirstPart = "https://image.tmdb.org/t/p/w500/";
 
         Picasso.with(mContext)
                 .load(UrlFirstPart + movie.getMoviePoster())

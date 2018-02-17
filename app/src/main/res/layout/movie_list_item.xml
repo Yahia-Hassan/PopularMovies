@@ -7,7 +7,7 @@
 
     <ImageView
         android:id="@+id/movie_poster"
-        android:layout_width="@dimen/movie_poster_width"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
