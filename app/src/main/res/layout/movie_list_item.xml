@@ -16,13 +16,4 @@
         app:srcCompat="@color/colorAccent"
         android:contentDescription="@string/poster_of_the_movie"/>
 
-    <TextView
-        android:id="@+id/movie_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_8"
-        android:layout_marginTop="@dimen/margin_8"
-        tools:text="TextView"
-        app:layout_constraintStart_toStartOf="@+id/movie_poster"
-        app:layout_constraintTop_toBottomOf="@+id/movie_poster" />
 </android.support.constraint.ConstraintLayout>
