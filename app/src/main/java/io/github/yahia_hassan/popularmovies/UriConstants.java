@@ -2,7 +2,7 @@ package io.github.yahia_hassan.popularmovies;
 
 
 public class UriConstants {
-    public static final String SCHEME = "https";
+    public static final String SCHEME = "http";
 
     public static final String AUTHORITY = "api.themoviedb.org";
     public static final String VERSION_PATH = "3";

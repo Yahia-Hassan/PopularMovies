@@ -1,5 +1,6 @@
 package io.github.yahia_hassan.popularmovies;
 
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
@@ -53,12 +54,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mRecyclerView = findViewById(R.id.recycler_view);
+
+        /*
+         * I search online how to get the Activity orientation and find the solution here
+          * on Stack Overflow ( https://stackoverflow.com/a/11381854/5255289 )
+         */
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mLayoutManager = new GridLayoutManager(this, 3);
+        } else {
+            mLayoutManager = new GridLayoutManager(this, 2);
+        }
+
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
     @Override
     public Loader<String> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<String>(this) {
+            String mMovieJSON;
+
             @Nullable
             @Override
             public String loadInBackground() {
@@ -72,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         .appendPath(UriConstants.POPULAR_PATH)
                         .appendQueryParameter(UriConstants.API_KEY_QUERY_PARAM, APIKey.APIKey);
                 String url = builder.build().toString();
-
                 Request request = new Request.Builder()
                         .url(url)
                         .build();
@@ -87,8 +104,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
 
             @Override
+            public void deliverResult(@Nullable String data) {
+                mMovieJSON = data;
+                super.deliverResult(data);
+            }
+
+            @Override
             protected void onStartLoading() {
-                forceLoad();
+                if (mMovieJSON != null) {
+                    deliverResult(mMovieJSON);
+                } else {
+                    forceLoad();
+                }
+
             }
         };
     }
@@ -102,9 +130,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             movieArrayList = createMovieArrayList(rootJSONObject);
         }
 
-        mRecyclerView = findViewById(R.id.recycler_view);
-        mLayoutManager = new GridLayoutManager(this, 2);
-        mRecyclerView.setLayoutManager(mLayoutManager);
         mPopularMoviesAdapter = new PopularMoviesAdapter(this, movieArrayList);
         mRecyclerView.setAdapter(mPopularMoviesAdapter);
     }

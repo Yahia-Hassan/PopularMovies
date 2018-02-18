@@ -25,6 +25,11 @@ public class DetailsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Movie movie = intent.getParcelableExtra(PopularMoviesAdapter.EXTRA_MESSAGE);
+
+        /*
+         * I searched online how to set the title of the activity, found the answer on this
+          * Stack Overflow answer ( https://stackoverflow.com/a/2198569/5255289 )
+         */
         setTitle(movie.getMovieTitle());
 
         mMovieTitleTextView.setText(movie.getMovieTitle());
@@ -32,6 +37,7 @@ public class DetailsActivity extends AppCompatActivity {
         String UrlFirstPart = "https://image.tmdb.org/t/p/w780/";
         Picasso.with(this)
                 .load(UrlFirstPart + movie.getMoviePoster())
+                .placeholder(R.color.placeholder_grey)
                 .into(mMoviePosterImageView);
 
         mPlotSynopsisTextView.setText(movie.getPlotSynopsis());

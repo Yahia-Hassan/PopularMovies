@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class PopularMoviesAdapter extends RecyclerView.Adapter<PopularMoviesAdapter.PopularMoviesViewHolder> {
+
+    private static final String TAG = PopularMoviesAdapter.class.getSimpleName();
 
     public static final String EXTRA_MESSAGE = "DetailActivity key";
 
@@ -45,8 +48,9 @@ public class PopularMoviesAdapter extends RecyclerView.Adapter<PopularMoviesAdap
                 .appendPath(UriConstants.IMAGE_T_PATH)
                 .appendPath(UriConstants.IMAGE_P_PATH)
                 .appendPath(UriConstants.IMAGE_WIDTH_PATH)
-                .appendPath(movie.getMoviePoster());
+                .appendEncodedPath(movie.getMoviePoster());
         String imageUrl = builder.build().toString();
+        Log.d(TAG, "The Adapter URL: " + imageUrl);
         //TODO (2) use error and placeholder.
         Picasso.with(mContext)
                 .load(imageUrl)
