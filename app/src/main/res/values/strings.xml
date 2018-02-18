@@ -4,4 +4,5 @@
     <string name="plot_sypnosis_label">Plot Sypnosis</string>
     <string name="release_date_label">Release Date</string>
     <string name="user_rating_label">User Rating</string>
+    <string name="settings_menu">Settings</string>
 </resources>
