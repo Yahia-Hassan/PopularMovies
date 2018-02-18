@@ -25,6 +25,8 @@ public class DetailsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Movie movie = intent.getParcelableExtra(PopularMoviesAdapter.EXTRA_MESSAGE);
+        setTitle(movie.getMovieTitle());
+
         mMovieTitleTextView.setText(movie.getMovieTitle());
 
         String UrlFirstPart = "https://image.tmdb.org/t/p/w780/";

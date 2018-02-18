@@ -1,5 +1,7 @@
 package io.github.yahia_hassan.popularmovies;
 
+import android.net.Uri;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -28,9 +30,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final int LOADER_ID = 45;
 
+
+    //TODO (3) Consider making them local variables.
+
+    //TODO (4) Add the settings activity
+
+    //TODO (4) Handle no network
     private RecyclerView mRecyclerView;
     private PopularMoviesAdapter mPopularMoviesAdapter;
     private GridLayoutManager mLayoutManager;
+
 
     private static final String RESULTS_JSON_ARRAY = "results";
     private static final String MOVIE_ORIGINAL_TITLE_STRING = "original_title";
@@ -55,8 +64,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public String loadInBackground() {
                 String jsonString = null;
                 OkHttpClient client = new OkHttpClient();
+                Uri.Builder builder = new Uri.Builder();
+                builder.scheme(UriConstants.SCHEME)
+                        .authority(UriConstants.AUTHORITY)
+                        .appendPath(UriConstants.VERSION_PATH)
+                        .appendPath(UriConstants.MOVIE_PATH)
+                        .appendPath(UriConstants.POPULAR_PATH)
+                        .appendQueryParameter(UriConstants.API_KEY_QUERY_PARAM, APIKey.APIKey);
+                String url = builder.build().toString();
+
                 Request request = new Request.Builder()
-                        .url("http://api.themoviedb.org/3/movie/popular?api_key=" + APIKey.APIKey)
+                        .url(url)
                         .build();
                 try {
                     Response response = client.newCall(request).execute();
@@ -84,13 +102,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             movieArrayList = createMovieArrayList(rootJSONObject);
         }
 
-
         mRecyclerView = findViewById(R.id.recycler_view);
-        mPopularMoviesAdapter = new PopularMoviesAdapter(this, movieArrayList);
         mLayoutManager = new GridLayoutManager(this, 2);
-        Log.d(TAG, "Adapter and Layout attached");
-        mRecyclerView.setAdapter(mPopularMoviesAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mPopularMoviesAdapter = new PopularMoviesAdapter(this, movieArrayList);
+        mRecyclerView.setAdapter(mPopularMoviesAdapter);
     }
 
     @Override
@@ -144,4 +160,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         return jsonObject;
     }
+
+
+
 }

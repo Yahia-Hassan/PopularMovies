@@ -3,6 +3,7 @@ package io.github.yahia_hassan.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +39,17 @@ public class PopularMoviesAdapter extends RecyclerView.Adapter<PopularMoviesAdap
     @Override
     public void onBindViewHolder(PopularMoviesViewHolder holder, int position) {
         Movie movie = mMovieArrayList.get(position);
-        String UrlFirstPart = "https://image.tmdb.org/t/p/w500/";
-
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(UriConstants.SCHEME)
+                .authority(UriConstants.IMAGE_AUTHORITY)
+                .appendPath(UriConstants.IMAGE_T_PATH)
+                .appendPath(UriConstants.IMAGE_P_PATH)
+                .appendPath(UriConstants.IMAGE_WIDTH_PATH)
+                .appendPath(movie.getMoviePoster());
+        String imageUrl = builder.build().toString();
+        //TODO (2) use error and placeholder.
         Picasso.with(mContext)
-                .load(UrlFirstPart + movie.getMoviePoster())
+                .load(imageUrl)
                 .into(holder.moviePoster);
     }
 
