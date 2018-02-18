@@ -91,9 +91,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Log.d(TAG, "Adapter and Layout attached");
         mRecyclerView.setAdapter(mPopularMoviesAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-
-
     }
 
     @Override
