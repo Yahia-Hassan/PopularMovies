@@ -1,9 +1,16 @@
 package io.github.yahia_hassan.popularmovies;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -16,6 +23,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,17 +41,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int LOADER_ID = 45;
+    public static final int LOADER_ID = 45;
 
 
-    //TODO (3) Consider making them local variables.
-
-    //TODO (4) Add the settings activity
-
-    //TODO (4) Handle no network
     private RecyclerView mRecyclerView;
     private PopularMoviesAdapter mPopularMoviesAdapter;
     private GridLayoutManager mLayoutManager;
+    private CoordinatorLayout mCoordinatorLayout;
+    private ProgressBar mProgressBar;
 
 
     private static final String RESULTS_JSON_ARRAY = "results";
@@ -58,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
 
         mRecyclerView = findViewById(R.id.recycler_view);
+        mCoordinatorLayout = findViewById(R.id.coordinatorLayout);
+        mProgressBar = findViewById(R.id.progress_bar);
 
         /*
          * I search online how to get the Activity orientation and find the solution here
@@ -72,25 +80,37 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
+        if (isNetworkAvailable()) {
+            getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+        } else {
+            showNoNetworkSnackbar();
+        }
+
     }
 
     @Override
     public Loader<String> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<String>(this) {
-            String mMovieJSON;
+            //String mMovieJSON;
 
             @Nullable
             @Override
             public String loadInBackground() {
                 String jsonString = null;
+
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+                String popularOrTopRated = sharedPreferences.getString(
+                                                        getString(R.string.pref_sort_by_key),
+                                                        getString(R.string.pref_sort_popular));
+
                 OkHttpClient client = new OkHttpClient();
                 Uri.Builder builder = new Uri.Builder();
                 builder.scheme(UriConstants.SCHEME)
                         .authority(UriConstants.AUTHORITY)
                         .appendPath(UriConstants.VERSION_PATH)
                         .appendPath(UriConstants.MOVIE_PATH)
-                        .appendPath(UriConstants.POPULAR_PATH)
+                        .appendPath(popularOrTopRated)
                         .appendQueryParameter(UriConstants.API_KEY_QUERY_PARAM, APIKey.APIKey);
                 String url = builder.build().toString();
                 Request request = new Request.Builder()
@@ -108,17 +128,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             public void deliverResult(@Nullable String data) {
-                mMovieJSON = data;
+                CacheJSON.mMovieJSON = data;
                 super.deliverResult(data);
             }
 
             @Override
             protected void onStartLoading() {
-                if (mMovieJSON != null) {
-                    deliverResult(mMovieJSON);
+                if (CacheJSON.mMovieJSON != null) {
+                    deliverResult(CacheJSON.mMovieJSON);
                 } else {
+                    showProgressBar();
                     forceLoad();
                 }
+
 
             }
         };
@@ -126,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<String> loader, String data) {
+        showRecyclerView();
         JSONObject rootJSONObject = createJSONObjectFromString(data);
         ArrayList<Movie> movieArrayList = null;
 
@@ -139,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
-
+        getSupportLoaderManager().destroyLoader(LOADER_ID);
     }
 
 
@@ -158,13 +181,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             JSONObject nthJSONObject = resultsJSONArray.optJSONObject(i);
             String movieTitle = nthJSONObject.optString(MOVIE_ORIGINAL_TITLE_STRING);
             String moviePoster = nthJSONObject.optString(MOVIE_POSTER_PATH_STRING);
-            String plotSypnosis = nthJSONObject.optString(MOVIE_PLOT_SYNOPSIS_STRING);
+            String plotSynopsis = nthJSONObject.optString(MOVIE_PLOT_SYNOPSIS_STRING);
             String userRating = nthJSONObject.optString(MOVIE_USER_RATING_STRING);
             String releaseDate = nthJSONObject.optString(MOVIE_RELEASE_DATE_STRING);
 
             movie = new Movie(movieTitle,
                     moviePoster,
-                    plotSypnosis,
+                    plotSynopsis,
                     userRating,
                     releaseDate);
 
@@ -190,6 +213,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -202,12 +231,42 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.settings:
-
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    private void restartLoader() {
+        if (isNetworkAvailable()) {
+            getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+        } else {
+            showNoNetworkSnackbar();
+        }
+
+    }
+
+    private void showNoNetworkSnackbar() {
+        Snackbar.make(mCoordinatorLayout, R.string.no_network_snack_bar, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry_snack_bar, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        restartLoader();
+                    }
+                }).show();
+    }
+
+    private void showProgressBar() {
+        mProgressBar.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+
+    }
+
+    private void showRecyclerView() {
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
+    }
 
 }

@@ -50,8 +50,6 @@ public class PopularMoviesAdapter extends RecyclerView.Adapter<PopularMoviesAdap
                 .appendPath(UriConstants.IMAGE_WIDTH_PATH)
                 .appendEncodedPath(movie.getMoviePoster());
         String imageUrl = builder.build().toString();
-        Log.d(TAG, "The Adapter URL: " + imageUrl);
-        //TODO (2) use error and placeholder.
         Picasso.with(mContext)
                 .load(imageUrl)
                 .into(holder.moviePoster);
