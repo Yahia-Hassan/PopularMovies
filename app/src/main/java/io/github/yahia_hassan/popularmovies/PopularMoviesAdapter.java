@@ -24,9 +24,9 @@ public class PopularMoviesAdapter extends RecyclerView.Adapter<PopularMoviesAdap
     private ArrayList<Movie> mMovieArrayList;
     private Context mContext;
 
-    public PopularMoviesAdapter (Context context, ArrayList<Movie> movieArrayList) {
-        mMovieArrayList = movieArrayList;
+    public PopularMoviesAdapter (Context context) {
         mContext = context;
+        mMovieArrayList = null;
     }
 
 
@@ -58,6 +58,11 @@ public class PopularMoviesAdapter extends RecyclerView.Adapter<PopularMoviesAdap
     @Override
     public int getItemCount() {
         return mMovieArrayList.size();
+    }
+
+    public void swapList (ArrayList<Movie> newArrayList) {
+        mMovieArrayList = newArrayList;
+        this.notifyDataSetChanged();
     }
 
 

@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         /*
          * I search online how to get the Activity orientation and find the solution here
-          * on Stack Overflow ( https://stackoverflow.com/a/11381854/5255289 )
+         * on Stack Overflow ( https://stackoverflow.com/a/11381854/5255289 )
          */
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mLayoutManager = new GridLayoutManager(this, 3);
@@ -77,7 +77,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mLayoutManager = new GridLayoutManager(this, 2);
         }
 
-
+        mPopularMoviesAdapter = new PopularMoviesAdapter(this);
+        mRecyclerView.setAdapter(mPopularMoviesAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
@@ -101,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
                 String popularOrTopRated = sharedPreferences.getString(
-                                                        getString(R.string.pref_sort_by_key),
-                                                        getString(R.string.pref_sort_popular));
+                        getString(R.string.pref_sort_by_key),
+                        getString(R.string.pref_sort_popular));
 
                 OkHttpClient client = new OkHttpClient();
                 Uri.Builder builder = new Uri.Builder();
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         .appendPath(UriConstants.VERSION_PATH)
                         .appendPath(UriConstants.MOVIE_PATH)
                         .appendPath(popularOrTopRated)
-                        .appendQueryParameter(UriConstants.API_KEY_QUERY_PARAM, APIKey.APIKey);
+                        .appendQueryParameter(UriConstants.API_KEY_QUERY_PARAM, APIKEY);
                 String url = builder.build().toString();
                 Request request = new Request.Builder()
                         .url(url)
@@ -156,8 +157,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             movieArrayList = createMovieArrayList(rootJSONObject);
         }
 
-        mPopularMoviesAdapter = new PopularMoviesAdapter(this, movieArrayList);
-        mRecyclerView.setAdapter(mPopularMoviesAdapter);
+
+        mPopularMoviesAdapter.swapList(movieArrayList);
     }
 
     @Override
